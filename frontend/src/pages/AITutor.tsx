@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef, FormEvent } from 'react';
-import { Bot, Send, Loader2, Plus, MessageSquare, Clock, Zap, Copy, ChevronDown, Lock } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import type { FormEvent } from 'react';
+import { Bot, Send, Loader2, Plus, Copy } from 'lucide-react';
 import AppLayout from '../components/AppLayout';
 import { aiAPI } from '../lib/api';
 import type { AIChat, ChatMessage } from '../types/index';
@@ -16,7 +17,7 @@ export default function AITutor() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingChats, setLoadingChats] = useState(true);
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const sidebarVisible = true;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 

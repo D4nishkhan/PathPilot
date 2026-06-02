@@ -1,5 +1,6 @@
-import { useState, FormEvent } from 'react';
-import { User, Camera, Lock, Zap, Star, Trophy, Shield, Edit3, Save, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import { User, Lock, Zap, Star, Trophy, Shield, Edit3, Save, Loader2 } from 'lucide-react';
 import AppLayout from '../components/AppLayout';
 import { userAPI } from '../lib/api';
 import { useAuthStore } from '../store';

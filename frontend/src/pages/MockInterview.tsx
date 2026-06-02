@@ -1,5 +1,6 @@
-import { useState, FormEvent, useEffect, useRef } from 'react';
-import { Mic, Send, Loader2, ChevronRight, Trophy, ArrowLeft, FileText } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import type { FormEvent } from 'react';
+import { Mic, Send, Loader2, Trophy } from 'lucide-react';
 import AppLayout from '../components/AppLayout';
 import { aiAPI } from '../lib/api';
 import type { ChatMessage } from '../types/index';

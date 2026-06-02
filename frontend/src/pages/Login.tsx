@@ -1,4 +1,5 @@
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Zap, Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
 import { authAPI } from '../lib/api';

@@ -1,8 +1,8 @@
-import { useState, FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import {
   Map, Loader2, Sparkles, Calendar, Clock,
-  ChevronRight, Target, BookOpen, CheckCircle,
+  ChevronRight, Target, BookOpen,
   ArrowRight, Plus
 } from 'lucide-react';
 import AppLayout from '../components/AppLayout';
@@ -10,7 +10,6 @@ import { aiAPI } from '../lib/api';
 import type { Roadmap } from '../types/index';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store';
-import { format } from 'date-fns';
 
 const SKILLS = ['Java Backend', 'MERN Stack', 'React', 'Python', 'Data Analytics', 'DSA & Algorithms', 'DevOps', 'Flutter', 'Machine Learning', 'System Design'];
 const LEVELS = [

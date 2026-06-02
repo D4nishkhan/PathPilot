@@ -1,6 +1,7 @@
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, ArrowLeft, Mail, Loader2, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Mail, Loader2, CheckCircle } from 'lucide-react';
 import { authAPI } from '../lib/api';
 import toast from 'react-hot-toast';
 

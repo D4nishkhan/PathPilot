@@ -32,7 +32,7 @@ Your role is to conduct mock technical interviews.
 // AI Tutor - single message
 const tutorChat = async (messages, context = {}) => {
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     systemInstruction: TUTOR_SYSTEM_PROMPT,
   });
 
@@ -54,7 +54,7 @@ const tutorChat = async (messages, context = {}) => {
 // Generate roadmap
 const generateRoadmap = async ({ skill, currentLevel, dailyHours, goal }) => {
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     systemInstruction: ROADMAP_SYSTEM_PROMPT,
     generationConfig: {
       responseMimeType: 'application/json',
@@ -107,7 +107,7 @@ Return a JSON object with this exact structure:
 // Mock interview
 const conductInterview = async (messages, mode, questionCount = 0) => {
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     systemInstruction: INTERVIEW_SYSTEM_PROMPT,
   });
 
@@ -131,7 +131,7 @@ const conductInterview = async (messages, mode, questionCount = 0) => {
 // Generate interview report
 const generateInterviewReport = async (questions) => {
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     generationConfig: { responseMimeType: 'application/json' },
   });
 

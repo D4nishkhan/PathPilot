@@ -9,3 +9,5 @@ backend/node_modules/
 
 frontend/dist/
 backend/dist/
+.ideavo/project
+*.log

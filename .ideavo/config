@@ -1,0 +1,62 @@
+{
+  "systemSetup": [],
+  "templateName": "custom",
+  "projectDependencies": [
+    {
+      "name": "Install backend deps",
+      "command": "cd /home/user/project/backend && npm install"
+    },
+    {
+      "name": "Install frontend deps",
+      "command": "cd /home/user/project/frontend && npm install"
+    }
+  ],
+  "codeChecks": [
+    {
+      "name": "Run ESLint",
+      "command": "cd /home/user/project/frontend && npm run lint"
+    }
+  ],
+  "buildSteps": [
+    {
+      "name": "Build frontend",
+      "command": "cd /home/user/project/frontend && npm run build"
+    }
+  ],
+  "runStep": [
+    {
+      "name": "Start dev servers",
+      "command": "cd /home/user/project/backend && npm run dev & (cd /home/user/project/frontend && npm run dev -- --host)",
+      "port": "5173"
+    }
+  ],
+  "deploySteps": [
+    {
+      "name": "Build frontend",
+      "command": "cd /home/user/project/frontend && npm run build"
+    },
+    {
+      "name": "Start backend",
+      "command": "cd /home/user/project/backend && npm start"
+    }
+  ],
+  "cleanupFiles": [
+    "node_modules",
+    "frontend/node_modules",
+    "frontend/dist",
+    "backend/node_modules",
+    ".env",
+    "frontend/.env"
+  ],
+  "packageManager": "npm",
+  "envPaths": [
+    {
+      "name": "Backend ENV",
+      "path": ".env"
+    },
+    {
+      "name": "Frontend ENV",
+      "path": "frontend/.env"
+    }
+  ]
+}

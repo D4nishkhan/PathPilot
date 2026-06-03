@@ -15,14 +15,35 @@ export default function Login() {
   const navigate = useNavigate();
 
  const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error('Please enter both email and password');
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      const res = await authAPI.login({ email, password });
+      
+      if (res.data.success) {
+        setAuth(res.data.user, res.data.token);
+        toast.success('Login successful!');
+        navigate('/dashboard');
+      } else {
+        toast.error(res.data.message || 'Login failed');
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      const errorMessage = err.response?.data?.message || 'Login failed. Please check your credentials.';
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  alert("BEFORE API CALL");
-
-  const res = await authAPI.login({ email, password });
-
-  alert("AFTER API CALL");
-}
+  const handleGoogle = () => {
 
   const handleGoogle = () => {
     window.location.href = `${import.meta.env.VITE_API_URL || '/api'}/auth/google`;

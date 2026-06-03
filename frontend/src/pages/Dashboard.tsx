@@ -30,11 +30,18 @@ export default function Dashboard() {
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  console.log('[Dashboard] MOUNTED - user from store:', user);
+  console.log('[Dashboard] MOUNTED - full store state:', useAuthStore.getState());
+
   useEffect(() => {
+    console.log('[Dashboard] useEffect - Fetching dashboard data');
     progressAPI.getDashboard().then((res) => {
+      console.log('[Dashboard] getDashboard response:', res.data);
       setStats(res.data.stats);
       setTrackProgress(res.data.trackProgress);
       setRecentActivity(res.data.recentActivity);
+    }).catch((err) => {
+      console.error('[Dashboard] getDashboard error:', err);
     }).finally(() => setLoading(false));
   }, []);
 

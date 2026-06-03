@@ -22,8 +22,11 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
 
       setAuth: (user, token) => {
+        console.log('[Store.setAuth] Called with:', { user, token });
         localStorage.setItem('pathpilot_token', token);
         set({ user, token, isAuthenticated: true });
+        console.log('[Store.setAuth] Store updated - new state:', { user, token, isAuthenticated: true });
+        console.log('[Store.setAuth] localStorage "pathpilot-auth":', localStorage.getItem('pathpilot-auth'));
       },
 
       updateUser: (updates) => {
@@ -45,6 +48,10 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+// Log store hydration
+console.log('[Store] Initial state on app load:', useAuthStore.getState());
+console.log('[Store] Persisted data in localStorage:', localStorage.getItem('pathpilot-auth'));
 
 // ─── UI State ──────────────────────────────────────────────────
 interface UIState {

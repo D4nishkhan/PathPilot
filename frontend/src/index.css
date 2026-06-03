@@ -240,6 +240,7 @@ body {
   transition: width 0.5s ease;
 }
 
+/* ─── Sidebar ─────────────────────────────────────────────── */
 .sidebar {
   width: 260px;
   min-height: 100vh;
@@ -252,19 +253,31 @@ body {
   left: 0;
   z-index: 40;
   transition: transform 0.3s ease;
-
-  /* ADD THIS */
-  transform: translateX(-100%);
 }
 
-.sidebar.open {
-  transform: translateX(0);
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin: 1px 8px;
 }
 
-@media (min-width: 768px) {
-  .sidebar {
-    transform: translateX(0);
-  }
+.sidebar-link:hover {
+  background: rgba(99, 102, 241, 0.1);
+  color: #c7d2fe;
+}
+
+.sidebar-link.active {
+  background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2));
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.25);
 }
 
 /* ─── XP Bar ──────────────────────────────────────────────── */

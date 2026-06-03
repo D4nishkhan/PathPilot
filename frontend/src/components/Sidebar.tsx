@@ -50,6 +50,12 @@ export default function Sidebar() {
     navigate('/login');
   };
 
+  // On mobile (<768 px) a nav-link tap should close the overlay.
+  // On desktop the sidebar stays open after navigation.
+  const handleNavClick = () => {
+    if (window.innerWidth < 768) setSidebarOpen(false);
+  };
+
   return (
     <>
       {/* Mobile overlay */}
@@ -71,7 +77,8 @@ export default function Sidebar() {
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="btn-ghost p-1 md:hidden"
+            className="btn-ghost p-1"
+            aria-label="Close sidebar"
           >
             <X size={18} />
           </button>
@@ -131,7 +138,7 @@ export default function Sidebar() {
             <NavLink
               key={to}
               to={to}
-              onClick={() => setSidebarOpen(false)}
+              onClick={handleNavClick}
               className={({ isActive }) =>
                 `sidebar-link ${isActive ? 'active' : ''} ${premium && user?.plan !== 'premium' ? 'opacity-60' : ''}`
               }
@@ -147,6 +154,7 @@ export default function Sidebar() {
           {user?.role === 'admin' && (
             <NavLink
               to="/admin"
+              onClick={handleNavClick}
               className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
             >
               <Shield size={18} />

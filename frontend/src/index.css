@@ -253,6 +253,13 @@ body {
   left: 0;
   z-index: 40;
   transition: transform 0.3s ease;
+  /* Hidden by default on ALL viewports — revealed via .open class */
+  transform: translateX(-100%);
+}
+
+/* Visible state — driven by sidebarOpen in Zustand (both mobile & desktop) */
+.sidebar.open {
+  transform: translateX(0);
 }
 
 .sidebar-link {
@@ -363,10 +370,8 @@ code {
 }
 
 /* ─── Responsive ──────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
-}
+/* Sidebar open/close is handled universally by .sidebar / .sidebar.open above.
+   Mobile overlay (backdrop) is rendered conditionally in Sidebar.tsx via sidebarOpen. */
 
 /* ─── Chat bubbles ────────────────────────────────────────── */
 .chat-user {

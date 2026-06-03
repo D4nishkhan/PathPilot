@@ -61,7 +61,8 @@ interface UIState {
 }
 
 export const useUIStore = create<UIState>((set) => ({
-  sidebarOpen: false,
+  // Open by default on desktop (≥768 px), closed on mobile.
+  sidebarOpen: typeof window !== 'undefined' ? window.innerWidth >= 768 : true,
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
 }));

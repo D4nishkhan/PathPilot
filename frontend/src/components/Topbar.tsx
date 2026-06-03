@@ -15,7 +15,8 @@ export default function Topbar({ title }: TopbarProps) {
       <div className="flex items-center gap-4">
         <button
           onClick={toggleSidebar}
-          className="btn-ghost p-2 md:hidden"
+          className="btn-ghost p-2"
+          aria-label="Toggle sidebar"
         >
           <Menu size={20} />
         </button>

@@ -6,7 +6,7 @@ import { authAPI } from '../lib/api';
 import { useAuthStore } from '../store';
 import toast from 'react-hot-toast';
 
-export default async function Login() {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -14,15 +14,11 @@ export default async function Login() {
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
 
- const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
+alert("BEFORE API CALL");
 
-  alert("BEFORE API CALL");
+const res = await authAPI.login({ email, password });
 
-  const res = await authAPI.login({ email, password });
-
-  alert("AFTER API CALL");
-}
+alert("AFTER API CALL");
 
   const handleGoogle = () => {
     window.location.href = `${import.meta.env.VITE_API_URL || '/api'}/auth/google`;

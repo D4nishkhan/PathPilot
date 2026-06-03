@@ -84,6 +84,23 @@ const generateRoadmap = async (req, res, next) => {
 
     const roadmapData = await geminiService.generateRoadmap({ skill, currentLevel, dailyHours, goal });
 
+// Normalize resources
+roadmapData.resources = (roadmapData.resources || []).map(r => ({
+  ...r,
+  type: ['book', 'course', 'docs', 'video', 'tool'].includes(r.type)
+    ? r.type
+    : 'docs'
+}));
+
+// Normalize task resource types
+roadmapData.weeks?.forEach(week => {
+  week.tasks?.forEach(task => {
+    if (!['video', 'reading', 'practice', 'project'].includes(task.resourceType)) {
+      task.resourceType = 'reading';
+    }
+  });
+});
+
     const roadmap = await Roadmap.create({
       userId,
       title: roadmapData.title,

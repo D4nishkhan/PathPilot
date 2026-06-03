@@ -14,6 +14,11 @@ export default function Login() {
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
 
+  alert("BEFORE API CALL");
+
+const res = await authAPI.login({ email, password });
+
+alert("AFTER API CALL");
 const handleSubmit = async (e: FormEvent) => {
   e.preventDefault();
 

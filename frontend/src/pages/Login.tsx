@@ -14,20 +14,14 @@ export default function Login() {
   const { setAuth } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await authAPI.login({ email, password });
-      setAuth(res.data.user, res.data.token);
-      toast.success('Welcome back! 🚀');
-      navigate('/dashboard');
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+
+  alert("SUBMIT WORKING");
+
+  setLoading(true);
+  
+}
 
   const handleGoogle = () => {
     window.location.href = `${import.meta.env.VITE_API_URL || '/api'}/auth/google`;

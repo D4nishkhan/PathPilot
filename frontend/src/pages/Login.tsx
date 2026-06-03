@@ -16,14 +16,28 @@ export default function Login() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      toast.error('Please enter both email and password');
+      return;
+    }
+
     setLoading(true);
+
     try {
       const res = await authAPI.login({ email, password });
-      setAuth(res.data.user, res.data.token);
-      navigate('/dashboard');
-      toast.success('Login successful!');
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Login failed');
+
+      if (res.data.success) {
+        setAuth(res.data.user, res.data.token);
+        toast.success('Login successful!');
+        navigate('/dashboard');
+      } else {
+        toast.error(res.data.message || 'Login failed');
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      const errorMessage = err.response?.data?.message || 'Login failed. Please check your credentials.';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

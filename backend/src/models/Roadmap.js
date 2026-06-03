@@ -48,7 +48,7 @@ const roadmapSchema = new mongoose.Schema(
       {
         title: String,
         url: String,
-        type: { type: String, enum: ['book', 'course', 'docs', 'video', 'tool'] },
+        type: { type: String, enum: ['book', 'course', 'docs', 'video', 'tool', 'reading'] },
       },
     ],
   },

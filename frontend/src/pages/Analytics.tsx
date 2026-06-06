@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import {
   BarChart3, TrendingUp, Clock, BookOpen, Trophy, Target,
-  Zap, Flame, Brain, ChevronUp
+  Zap, Flame, Brain, Link as LinkIcon
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import AppLayout from '../components/AppLayout';
 import { progressAPI } from '../lib/api';
 import { useAuthStore } from '../store';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, RadarChart, Radar, PolarGrid,
-  PolarAngleAxis, PolarRadiusAxis, BarChart, Bar, Cell
+  PolarAngleAxis, PolarRadiusAxis,
 } from 'recharts';
 import { format, subDays } from 'date-fns';
 
@@ -38,14 +39,15 @@ export default function Analytics() {
     }).finally(() => setLoading(false));
   }, []);
 
-  // Generate last 14 days chart data
+  // Build last-14-days chart from real studyByDay data only.
+  // studyByDay is keyed "YYYY-MM-DD" → minutes. Zero for days with no activity.
+  // REMOVED: Math.random() fallback that generated fake study time.
   const studyChartData = Array.from({ length: 14 }, (_, i) => {
     const date = subDays(new Date(), 13 - i);
     const key = format(date, 'yyyy-MM-dd');
     return {
       date: format(date, 'MMM dd'),
-      minutes: analytics?.videosPerWeek?.[key] ? analytics.videosPerWeek[key] * 15 : Math.floor(Math.random() * 60),
-      videos: analytics?.videosPerWeek?.[key] || 0,
+      minutes: analytics?.studyByDay?.[key] ?? 0,
     };
   });
 
@@ -66,6 +68,8 @@ export default function Analytics() {
     { icon: Flame, label: 'Best Streak', value: user?.longestStreak ?? 0, sub: 'days', color: 'text-orange-400', bg: 'bg-orange-500/10' },
   ];
 
+  const hasAnyActivity = studyChartData.some(d => d.minutes > 0);
+
   return (
     <AppLayout title="Analytics">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -76,15 +80,12 @@ export default function Analytics() {
           <p className="text-slate-500 text-sm mt-1">Track your progress and identify areas to improve</p>
         </div>
 
-        {/* Stats grid */}
+        {/* Stats grid — no fake trend arrows */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {statCards.map((card) => (
             <div key={card.label} className="glass-card p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className={`w-9 h-9 rounded-xl ${card.bg} flex items-center justify-center`}>
-                  <card.icon size={18} className={card.color} />
-                </div>
-                <ChevronUp size={14} className="text-green-400" />
+              <div className={`w-9 h-9 rounded-xl ${card.bg} flex items-center justify-center mb-3`}>
+                <card.icon size={18} className={card.color} />
               </div>
               {loading ? (
                 <div className="skeleton h-8 w-16 rounded mb-1" />
@@ -98,11 +99,18 @@ export default function Analytics() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Study Time Chart */}
+          {/* Study Time Chart — real DB data only */}
           <div className="lg:col-span-2 glass-card p-5">
-            <h3 className="text-base font-semibold text-slate-200 mb-4">Study Activity (Last 14 Days)</h3>
+            <h3 className="text-base font-semibold text-slate-200 mb-1">Study Activity (Last 14 Days)</h3>
+            <p className="text-xs text-slate-600 mb-4">Minutes studied per day from your watch history</p>
             {loading ? (
               <div className="skeleton h-48 rounded-xl" />
+            ) : !hasAnyActivity ? (
+              <div className="h-48 flex flex-col items-center justify-center text-slate-600">
+                <BarChart3 size={32} className="mb-2 opacity-30" />
+                <p className="text-sm">No study activity yet</p>
+                <p className="text-xs mt-1">Start watching videos to see your progress here</p>
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height={200}>
                 <AreaChart data={studyChartData}>
@@ -177,7 +185,7 @@ export default function Analytics() {
           </div>
         )}
 
-        {/* Improvement suggestions */}
+        {/* Improvement suggestions — now with working link */}
         {(analytics?.weakTopics || 0) > 0 && (
           <div className="glass-card p-5 border-orange-500/20 bg-orange-500/5">
             <h3 className="text-base font-semibold text-orange-300 mb-2 flex items-center gap-2">
@@ -187,9 +195,9 @@ export default function Analytics() {
               You have {analytics.weakTopics} topic{analytics.weakTopics > 1 ? 's' : ''} with quiz scores below 60%.
               Consider revisiting those topics and re-taking the quizzes.
             </p>
-            <button className="btn-secondary text-sm mt-3">
-              View Weak Topics
-            </button>
+            <Link to="/tracks" className="btn-secondary text-sm mt-3 inline-flex items-center gap-2">
+              <LinkIcon size={14} /> Browse Tracks
+            </Link>
           </div>
         )}
       </div>

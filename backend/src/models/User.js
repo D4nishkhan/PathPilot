@@ -51,6 +51,14 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ─── Indexes ────────────────────────────────────────────────────
+// email is already indexed via unique:true in the schema field definition.
+// Additional indexes for common query patterns:
+userSchema.index({ xp: -1 });            // leaderboard: sort by XP descending
+userSchema.index({ plan: 1 });           // admin queries filter by plan
+userSchema.index({ role: 1 });           // admin queries filter by role
+userSchema.index({ createdAt: -1 });     // admin analytics: newest users first
+
 // Hash password before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();

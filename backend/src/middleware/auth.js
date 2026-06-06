@@ -45,9 +45,14 @@ const premiumOnly = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ success: false, message: 'Not authorized.' });
   }
-  const isPremium = req.user.plan === 'premium' && req.user.planExpiry > new Date();
   const isAdmin = req.user.role === 'admin';
-  if (!isPremium && !isAdmin) {
+  // planExpiry === null means lifetime/no-expiry premium (admin-granted).
+  // Only enforce expiry when planExpiry is explicitly set.
+  const hasActivePremium =
+    req.user.plan === 'premium' &&
+    (req.user.planExpiry == null || req.user.planExpiry > new Date());
+
+  if (!hasActivePremium && !isAdmin) {
     return res.status(403).json({
       success: false,
       message: 'Premium subscription required.',

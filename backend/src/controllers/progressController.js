@@ -160,14 +160,20 @@ const getAnalytics = async (req, res, next) => {
         ? Math.round(quizAttempts.reduce((s, a) => s + a.score, 0) / quizAttempts.length)
         : 0;
 
-    // Videos per week
-    const videosPerWeek = {};
-    allProgress
-      .filter((p) => p.videoCompleted && p.updatedAt)
-      .forEach((p) => {
-        const week = getWeekKey(p.updatedAt);
-        videosPerWeek[week] = (videosPerWeek[week] || 0) + 1;
-      });
+    // Build studyByDay: keyed "YYYY-MM-DD" → total minutes.
+    // Used by the Analytics chart. Replaces the broken videosPerWeek approach
+    // that returned week-start keys while the frontend iterated daily keys,
+    // causing all days to fall back to Math.random() fake data.
+    const studyByDay = {};
+    for (const p of allProgress) {
+      if (p.studySessions && p.studySessions.length > 0) {
+        for (const session of p.studySessions) {
+          if (!session.date) continue;
+          const day = new Date(session.date).toISOString().split('T')[0];
+          studyByDay[day] = (studyByDay[day] || 0) + (session.duration || 0);
+        }
+      }
+    }
 
     res.json({
       success: true,
@@ -178,21 +184,13 @@ const getAnalytics = async (req, res, next) => {
         quizzesPassed: allProgress.filter((p) => p.quizPassed).length,
         weakTopics,
         avgQuizScore,
-        videosPerWeek,
+        studyByDay,
         recentAttempts: quizAttempts.slice(0, 5),
       },
     });
   } catch (err) {
     next(err);
   }
-};
-
-const getWeekKey = (date) => {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(d.setDate(diff));
-  return monday.toISOString().split('T')[0];
 };
 
 module.exports = { updateVideoProgress, getDashboard, getAnalytics };

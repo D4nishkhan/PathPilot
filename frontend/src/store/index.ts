@@ -22,11 +22,10 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
 
       setAuth: (user, token) => {
-        console.log('[Store.setAuth] Called with:', { user, token });
+        // Keep a separate pathpilot_token key for the axios interceptor
+        // (interceptor reads this key directly without touching Zustand).
         localStorage.setItem('pathpilot_token', token);
         set({ user, token, isAuthenticated: true });
-        console.log('[Store.setAuth] Store updated - new state:', { user, token, isAuthenticated: true });
-        console.log('[Store.setAuth] localStorage "pathpilot-auth":', localStorage.getItem('pathpilot-auth'));
       },
 
       updateUser: (updates) => {
@@ -36,7 +35,6 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         localStorage.removeItem('pathpilot_token');
-        localStorage.removeItem('pathpilot_user');
         set({ user: null, token: null, isAuthenticated: false });
       },
 
@@ -45,13 +43,15 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'pathpilot-auth',
       partialize: (state) => ({ user: state.user, token: state.token, isAuthenticated: state.isAuthenticated }),
+      // Sync the separate token key whenever the store rehydrates from localStorage
+      onRehydrateStorage: () => (state) => {
+        if (state?.token) {
+          localStorage.setItem('pathpilot_token', state.token);
+        }
+      },
     }
   )
 );
-
-// Log store hydration
-console.log('[Store] Initial state on app load:', useAuthStore.getState());
-console.log('[Store] Persisted data in localStorage:', localStorage.getItem('pathpilot-auth'));
 
 // ─── UI State ──────────────────────────────────────────────────
 interface UIState {

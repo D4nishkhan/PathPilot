@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import {
   Map, Loader2, Sparkles, Calendar, Clock,
@@ -43,7 +43,10 @@ export default function RoadmapPage() {
     }
   };
 
-  useState(() => { loadRoadmaps(); });
+  // Load roadmaps on mount. Previously this used useState(() => loadRoadmaps())
+  // which is a hook misuse — the factory runs once but is not a side-effect hook.
+  // Roadmaps would silently not load on hard refresh.
+  useEffect(() => { loadRoadmaps(); }, []);
 
   const handleGenerate = async (e: FormEvent) => {
     e.preventDefault();

@@ -21,6 +21,10 @@ export default function AuthCallback() {
     }
 
     if (token) {
+      // Remove the token from the URL immediately so it is not stored in
+      // browser history or visible in referrer headers on subsequent requests.
+      window.history.replaceState({}, document.title, '/auth/callback');
+
       localStorage.setItem('pathpilot_token', token);
       authAPI.getMe().then((res) => {
         setAuth(res.data.user, token);

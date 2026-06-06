@@ -14,6 +14,18 @@ const tutorMessage = async (req, res, next) => {
     const { message, chatId, context } = req.body;
     const userId = req.user._id;
 
+    // Input validation
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({ success: false, message: 'Message is required.' });
+    }
+    const trimmedMessage = message.trim();
+    if (trimmedMessage.length === 0) {
+      return res.status(400).json({ success: false, message: 'Message cannot be empty.' });
+    }
+    if (trimmedMessage.length > 4000) {
+      return res.status(400).json({ success: false, message: 'Message is too long. Maximum 4000 characters.' });
+    }
+
     // Check daily message limit for free users
     if (req.user.plan !== 'premium' && req.user.role !== 'admin') {
       const today = new Date();
@@ -39,11 +51,11 @@ const tutorMessage = async (req, res, next) => {
       chat = await AIChat.findOne({ _id: chatId, userId });
     }
     if (!chat) {
-      chat = new AIChat({ userId, sessionType: 'tutor', title: message.substring(0, 50) });
+      chat = new AIChat({ userId, sessionType: 'tutor', title: trimmedMessage.substring(0, 50) });
     }
 
     // Add user message
-    chat.messages.push({ role: 'user', content: message });
+    chat.messages.push({ role: 'user', content: trimmedMessage });
 
     // Get AI response
     const aiResponse = await geminiService.tutorChat(

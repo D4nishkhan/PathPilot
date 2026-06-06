@@ -2,6 +2,9 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Abort any Gemini call that takes longer than 30 seconds
+const GEMINI_TIMEOUT_MS = 30_000;
+
 const TUTOR_SYSTEM_PROMPT = `You are PathPilot AI Tutor - an expert programming teacher and mentor. 
 Your responses MUST always follow this structure:
 1. 📖 **Explanation** - Clear, simple explanation of the concept
@@ -29,7 +32,33 @@ Your role is to conduct mock technical interviews.
 - Adapt difficulty based on answers
 - After all questions, provide a comprehensive evaluation`;
 
-// AI Tutor - single message
+/**
+ * Race a promise against a timeout. Rejects with a clear message if Gemini is slow.
+ */
+const withTimeout = (promise, ms = GEMINI_TIMEOUT_MS) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('AI service timed out. Please try again.')), ms)
+    ),
+  ]);
+};
+
+/**
+ * Safely parse JSON returned by Gemini. Strips any accidental markdown fences.
+ * Returns null if parsing fails instead of throwing.
+ */
+const safeParseJSON = (text) => {
+  try {
+    // Gemini sometimes wraps JSON in ```json ... ``` despite being told not to
+    const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    return JSON.parse(cleaned);
+  } catch {
+    return null;
+  }
+};
+
+// AI Tutor — multi-turn chat
 const tutorChat = async (messages, context = {}) => {
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
@@ -47,11 +76,11 @@ const tutorChat = async (messages, context = {}) => {
   let contextStr = '';
   if (context.topic) contextStr = `\n[Student is currently studying: ${context.topic}]`;
 
-  const result = await chat.sendMessage(lastMessage + contextStr);
+  const result = await withTimeout(chat.sendMessage(lastMessage + contextStr));
   return result.response.text();
 };
 
-// Generate roadmap
+// Generate roadmap — returns parsed object or throws with a clean message
 const generateRoadmap = async ({ skill, currentLevel, dailyHours, goal }) => {
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
@@ -99,12 +128,17 @@ Return a JSON object with this exact structure:
   ]
 }`;
 
-  const result = await model.generateContent(prompt);
+  const result = await withTimeout(model.generateContent(prompt));
   const text = result.response.text();
-  return JSON.parse(text);
+
+  const parsed = safeParseJSON(text);
+  if (!parsed) {
+    throw new Error('AI returned malformed roadmap data. Please try again.');
+  }
+  return parsed;
 };
 
-// Mock interview
+// Mock interview — multi-turn
 const conductInterview = async (messages, mode, questionCount = 0) => {
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
@@ -124,7 +158,7 @@ const conductInterview = async (messages, mode, questionCount = 0) => {
     contextStr += `\nStart by greeting the candidate and asking the first question for a ${mode} interview.`;
   }
 
-  const result = await chat.sendMessage(lastMessage + contextStr);
+  const result = await withTimeout(chat.sendMessage(lastMessage + contextStr));
   return result.response.text();
 };
 
@@ -149,8 +183,23 @@ Return:
   }
 }`;
 
-  const result = await model.generateContent(prompt);
-  return JSON.parse(result.response.text());
+  const result = await withTimeout(model.generateContent(prompt));
+  const text = result.response.text();
+
+  const parsed = safeParseJSON(text);
+  if (!parsed) {
+    // Return a safe default report rather than crashing the request
+    return {
+      overallScore: 0,
+      report: {
+        strengths: [],
+        weaknesses: ['Unable to evaluate — AI response was malformed.'],
+        suggestions: ['Please try generating the report again.'],
+        verdict: 'needs improvement',
+      },
+    };
+  }
+  return parsed;
 };
 
 module.exports = { tutorChat, generateRoadmap, conductInterview, generateInterviewReport };

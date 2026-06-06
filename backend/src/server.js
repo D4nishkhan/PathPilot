@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
 const passport = require('./config/passport');
 const connectDB = require('./config/db');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
@@ -40,6 +41,9 @@ app.use('/api/ai/', aiLimiter);
 // Body parsers
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Sanitize request data to prevent NoSQL injection (e.g. { "$gt": "" } in login fields)
+app.use(mongoSanitize());
 
 // Logging
 if (process.env.NODE_ENV === 'development') {
